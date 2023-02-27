@@ -1,37 +1,43 @@
 <?php
+    // Je recupère les pokemons en JSON
+    $json_pokemons = file_get_contents("pokemons.json");
+    // Je decode le JSON en véritable tableau de pokemons
+    $pokemons = json_decode($json_pokemons,true);
 
-// 1. Afficher tous les pokemons
-// 2. Creer la page showPokemon qui affiche un pokemon via son index dans le tableau
-// 3. Creer la page addPokemon
-// 4. Permettre la suppression d'un pokemon via un lien en GET par l'index
-// 4. Creer la page modifier pokemon et rajouter un button modifier
-
-//recuperer les données pokemons en json
-$json_data = file_get_contents("pokemons.json");
-//decoder le json en tableau
-$pokemons = json_decode($json_data, true);
-
+    if(isset($_GET["id"])){
+        $id = $_GET["id"];
+        // Supprimer le pokemon
+        unset($pokemons[$id]);
+        // Enregistrer les changements dans la BDD JSON
+        $json_pokemons = json_encode($pokemons);
+        file_put_contents("pokemons.json",$json_pokemons);
+    }
 ?>
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
     <link rel="stylesheet" href="style.css">
-    <title>Pokédex</title>
 </head>
 <body>
-    <h1>Pokédex</h1>
+    <div class="button"><a href="addPokemon.php">Ajouter un pokemon</a></div>
     <section class="cards">
-        <!-- Afficher -->
-        <?php foreach ($pokemons as $i => $pokemon): ?>
+        <?php  foreach($pokemons as $index=>$pokemon): ?>
             <div class="card">
-                <h2><?= $pokemon["name"] ?></h2>
-                <a href="showPokemon.php?id=<?= $i ?>">Détails</a>
-                <img src="<?= $pokemon["sprite"] ?>">
-                <p>ID: <?= $pokemon["id"] ?></p>
-                <a href="deletePokemon.php?id=<?= $i ?>" class="delete-link" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce Pokémon ?')">Supprimer</a>
+                <h2><a href="detailPokemon.php?id=<?=$index?>"> <?= $pokemon["name"]?> </a></h2>
+                <p>Pokedex Id : <?= $pokemon["pokedexId"]?></p>
+                <img src="<?= $pokemon["sprite"]?>" alt="<?= $pokemon["name"]?>">
+
+                <p> <a href="index.php?id=<?= $index ?>">Supprimer</a> </p>
+                <p> <a href="updatePokemon.php?id=<?= $index ?>">Modifier</a> </p>
+
             </div>
-        <?php endforeach; ?>
+        <?php endforeach;?>
     </section>
 </body>
 </html>
